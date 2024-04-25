@@ -1,6 +1,7 @@
 -- drop function if it exists
 DROP FUNCTION IF EXISTS SafeDiv;
 -- create function
+DELIMITER &&
 CREATE FUNCTION SafeDiv(a INT, b INT)
 RETURNS FLOAT
 DETERMINISTIC
@@ -11,3 +12,5 @@ BEGIN
     RETURN a / b;
   END IF;
 END
+$$
+DELIMITER ;
