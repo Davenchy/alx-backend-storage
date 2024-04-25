@@ -1,6 +1,7 @@
 -- Delete bonus procedure if exists
 DROP PROCEDURE IF EXISTS AddBonus;
 -- Create AddBonus procedure
+DELIMITER $$
 CREATE PROCEDURE AddBonus (
   IN user_id INT,
   IN project_name VARCHAR(255),
@@ -16,3 +17,5 @@ BEGIN
   -- insert new correction
   INSERT INTO corrections (user_id, project_id, score) VALUES (user_id, @project_id, score);
 END
+$$
+DELIMITER ;
