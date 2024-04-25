@@ -1,5 +1,7 @@
+-- Delete bonus procedure if exists
+DROP PROCEDURE IF EXISTS AddBonus;
 -- Create AddBonus procedure
-CREATE PROCEDURE AddBonus (IN user_id INT, IN project_name VARCHAR(255), IN score INT)
+CREATE PROCEDURE AddBonus (IN user_id INT, IN project_name VARCHAR(255), IN score FLOAT)
 BEGIN
   -- get project id using its name
   DECLARE project INT;
