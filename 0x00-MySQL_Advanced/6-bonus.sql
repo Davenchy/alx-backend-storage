@@ -10,7 +10,7 @@ BEGIN
   DECLARE project INT;
   SET project = (SELECT id FROM projects WHERE name = project_name);
   -- check if project is not exist
-  IF project IS NULL THEN
+  IF project = 0 THEN
     -- insert new project with given name
     INSERT INTO projects (name) VALUES (project_name);
     -- get new project id
