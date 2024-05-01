@@ -9,24 +9,49 @@ if __name__ == "__main__":
     with MongoClient() as client:
         docs = client.logs.nginx
 
-        print(f'{docs.count_documents({})} logs')
-        print('Methods:')
+        def countMethod(methodName):
+            return {
+                '$sum': {
+                    '$cond': [{'$eq': ['$method', methodName]}, 1, 0]
+                }
+            }
 
-        for method in METHODS:
-            count = docs.count_documents({"method": method})
-            print(f'\tmethod {method}: {count}')
+        results = docs.aggregate([
+            {
+                '$group': {
+                    '_id': None,
+                    'count': {'$sum': 1},
+                    'status': {
+                        '$sum': {
+                            '$cond': [{'$and': [
+                                {'$eq': ['$method', 'GET']},
+                                {'$eq': ['$path', '/status']}
+                            ], }, 1, 0]
+                        }
+                    },
+                    **{
+                        method: countMethod(method)
+                        for method in METHODS
+                    }
+                }
+            }
+        ]).next()
 
-        statusCount = docs.count_documents({
-            "method": "GET", "path": "/status"
-        })
-        print(f'{statusCount} status check')
-
-        print('IPs:')
+        log = "{logs} logs\nMethods:\n{methods}\n{status} status check\nIPs:"
+        print(log.format(
+            logs=results["count"],
+            methods="\n".join(
+                f"\tmethod {method}: {results.get(method, 0)}"
+                for method in METHODS
+            ),
+            status=results["status"]
+        ))
 
         ips = docs.aggregate([
             {"$group": {"_id": "$ip", "count": {"$sum": 1}}},
             {"$sort": {"count": -1}},
             {"$limit": 10}
         ])
+
         for ip in ips:
             print(f"\t{ip['_id']}: {ip['count']}")
