@@ -32,3 +32,11 @@ key = cache.store(b"hello")
 assert cache.get_str(key) == "hello"
 key = cache.store(123)
 assert cache.get_int(key) == 123
+
+# Task 2
+cache.store(b"first")
+print(cache.get(cache.store.__qualname__))
+
+cache.store(b"second")
+cache.store(b"third")
+print(cache.get(cache.store.__qualname__))

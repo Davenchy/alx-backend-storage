@@ -3,9 +3,20 @@
 import redis
 import uuid
 from typing import Union, Callable
+from functools import wraps
 
 DataTypes = Union[str, bytes, int, float]
 ConversionFn = Callable[[bytes], DataTypes]
+
+
+def count_calls(fn: Callable) -> Callable:
+    """ count function calls """
+    @wraps(fn)
+    def wrapper(self, *args, **kwargs):
+        """ inner wrapper function """
+        self._redis.incr(fn.__qualname__)
+        return fn(self, *args, **kwargs)
+    return wrapper
 
 
 class Cache:
@@ -16,6 +27,7 @@ class Cache:
         self._redis = redis.Redis()
         self._redis.flushdb()
 
+    @count_calls
     def store(self, data: DataTypes) -> str:
         """ Cache/store data """
         key = str(uuid.uuid1())
