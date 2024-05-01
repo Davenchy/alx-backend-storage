@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """ This script logs statistics about Nginx logs stored in MongoDB """
 from pymongo import MongoClient
+from pprint import pprint
 
 
 METHODS = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']
