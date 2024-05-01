@@ -2,20 +2,20 @@
 """ Using redis in python """
 import redis
 import uuid
-from typing import Union, Callable
+from typing import Union, Callable, Optional
 from functools import wraps
 
 DataTypes = Union[str, bytes, int, float]
 ConversionFn = Callable[[bytes], DataTypes]
 
 
-def count_calls(fn: Callable) -> Callable:
+def count_calls(method: Callable) -> Callable:
     """ count function calls """
-    @wraps(fn)
+    @wraps(method)
     def wrapper(self, *args, **kwargs):
         """ inner wrapper function """
-        self._redis.incr(fn.__qualname__)
-        return fn(self, *args, **kwargs)
+        self._redis.incr(method.__qualname__)
+        return method(self, *args, **kwargs)
     return wrapper
 
 
@@ -34,7 +34,7 @@ class Cache:
         self._redis.set(key, data)
         return key
 
-    def get(self, key: str, fn: Callable = None) -> DataTypes:
+    def get(self, key: str, fn: Optional[Callable] = None) -> DataTypes:
         """ get data from cache """
         data = self._redis.get(key)
         if fn:
