@@ -9,12 +9,10 @@ db = redis.Redis()
 
 def get_page(url: str) -> str:
     """ Fetch the content of a page using its URL """
-    db.incr(f'count:{url}')
+    # db.incr(f'count:{url}')
     content = db.get(f'content:{url}')
     if content:
-        print('catched')
         return content.decode('utf-8')
-    print('fetching')
     content = requests.get(url).text
     db.setex(f'content:{url}', 10, content)
     return content
