@@ -14,5 +14,6 @@ def get_page(url: str) -> str:
     if content:
         return content.decode('utf-8')
     content = requests.get(url).text
+    db.set(f'count:{url}', 0)
     db.setex(f'content:{url}', 10, content)
     return content
