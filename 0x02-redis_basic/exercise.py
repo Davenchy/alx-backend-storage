@@ -19,6 +19,19 @@ def count_calls(method: Callable) -> Callable:
     return wrapper
 
 
+def call_history(method: Callable) -> Callable:
+    """ Trace and store function history of inputs/outputs for each call """
+    @wraps(method)
+    def wrapper(self, *args, **kwargs):
+        """ inner tracer wrapper """
+        fn_name = method.__qualname__
+        self._redis.rpush(f'{fn_name}:inputs', str(args))
+        result = method(self, *args, **kwargs)
+        self._redis.rpush(f'{fn_name}:outputs', str(result))
+        return result
+    return wrapper
+
+
 class Cache:
     """ Cache Class """
 
@@ -28,6 +41,7 @@ class Cache:
         self._redis.flushdb()
 
     @count_calls
+    @call_history
     def store(self, data: DataTypes) -> str:
         """ Cache/store data """
         key = str(uuid.uuid1())
