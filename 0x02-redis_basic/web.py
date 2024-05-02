@@ -6,7 +6,6 @@ from functools import wraps
 from typing import Callable
 
 db = redis.Redis()
-db.flushdb()
 
 
 def count_and_cache(method: Callable) -> Callable:
