@@ -2,6 +2,7 @@
 """ implement simple cache decorator using redis db """
 import requests
 import redis
+from time import sleep
 
 db = redis.Redis()
 
@@ -11,8 +12,23 @@ def get_page(url: str) -> str:
     db.incr(f'count:{url}')
     content = db.get(f'content:{url}')
     if content:
+        print('catched')
         return content.decode('utf-8')
+    print('fetching')
     content = requests.get(url).text
-    db.set(f'count:{url}', 0)
     db.setex(f'content:{url}', 10, content)
     return content
+
+
+if __name__ == '__main__':
+    db.flushdb()
+    URL = 'https://github.com'
+    get_page(URL)
+    sleep(2)
+    get_page(URL)
+    sleep(3)
+    get_page(URL)
+    sleep(5)
+    get_page(URL)
+    count = int(db.get('count:' + URL))
+    print(f'Visited {count} times')
