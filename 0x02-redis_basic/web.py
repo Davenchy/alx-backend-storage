@@ -4,7 +4,6 @@ import requests
 import redis
 
 db = redis.Redis()
-db.flushdb()
 
 
 def get_page(url: str) -> str:
